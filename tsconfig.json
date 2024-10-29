@@ -1,0 +1,16 @@
+{
+  // Change this to match your project
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable"],
+    "allowJs": true,
+    "skipLibCheck": false,
+    "checkJs": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
+    "declarationMap": true,
+    "esModuleInterop": true
+  },
+  "exclude": ["node_modules", "dist"]
+}

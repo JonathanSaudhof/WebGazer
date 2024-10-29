@@ -32,6 +32,8 @@
     "regression": "2.0.1"
   },
   "devDependencies": {
+    "typescript": "^5",
+    "@types/node": "^20",
     "browser-sync": "^3.0.2",
     "filemanager-webpack-plugin": "^8.0.0",
     "jsdoc": "^4.0.2",
