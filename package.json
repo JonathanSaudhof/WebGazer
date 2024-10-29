@@ -6,12 +6,12 @@
     "url": "https://github.com/brownhci/WebGazer.git"
   },
   "license": "GPL-3.0-or-later",
-  "main": "dist/webgazer.js",
   "module": "src/index.mjs",
+  "type": "module",
   "scripts": {
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
-    "dev": "webpack --progress --config webpack.config.js --mode development",
+    "dev": "webpack --progress --config webpack.config.js --mode development --watch",
     "build": "webpack --progress --config webpack.config.js --mode production",
     "gen_docs": "jsdoc -c jsdoc.conf.json src/*"
   },
