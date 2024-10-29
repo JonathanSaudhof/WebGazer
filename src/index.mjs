@@ -11,8 +11,8 @@ import Reg from "./ridgeReg.mjs";
 import ridgeRegWeighted from "./ridgeWeightedReg.mjs";
 import ridgeRegThreaded from "./ridgeRegThreaded.mjs";
 import util from "./util.mjs";
-
 const webgazer = {};
+
 webgazer.tracker = {};
 webgazer.tracker.TFFaceMesh = TFFaceMesh;
 webgazer.reg = Reg;
@@ -32,7 +32,9 @@ var faceOverlay = null;
 var faceFeedbackBox = null;
 var gazeDot = null;
 // Why is this not in webgazer.params ?
-var debugVideoLoc = "";
+
+/** @type {MediaProvider} */
+var debugVideoLoc = null;
 
 /*
  * Initialises variables used to store accuracy eigenValues
@@ -196,7 +198,9 @@ function checkEyesInValidationBox() {
  * @param {number} y - The y co-ordinate of the desired point to plot
  */
 function drawCoordinates(colour, x, y) {
-  var ctx = document.getElementById("plotting_canvas").getContext("2d");
+  var ctx = /** @type {HTMLCanvasElement} */ (
+    document.getElementById("plotting_canvas")
+  ).getContext("2d");
   ctx.fillStyle = colour; // Red color
   ctx.beginPath();
   ctx.arc(x, y, 5, 0, Math.PI * 2, true);
@@ -242,7 +246,7 @@ function paintCurrentFrame(canvas, width, height) {
 
 /**
  * Paints the video to a canvas and runs the prediction pipeline to get a prediction
- * @param {Number|undefined} regModelIndex - The prediction index we're looking for
+ * @param {Number} [regModelIndex] - The prediction index we're looking for
  * @returns {Promise<*>}
  */
 async function getPrediction(regModelIndex) {
@@ -421,7 +425,7 @@ var moveListener = function (event) {
   } else {
     moveClock = now;
   }
-  recordScreenPosition(event.clientX, event.clientY, eventTypes[1]); //eventType[1] === 'move'
+  //   recordScreenPosition(event.clientX, event.clientY, eventTypes[1]); //eventType[1] === 'move'
 };
 
 /**
@@ -497,7 +501,7 @@ function clearData() {
 
 /**
  * Initializes all needed dom elements and begins the loop
- * @param {URL} stream - The video stream to use
+ * @param {MediaProvider} stream - The video stream to use
  */
 async function init(stream) {
   //////////////////////////
@@ -576,7 +580,7 @@ async function init(stream) {
   gazeDot.id = webgazer.params.gazeDotId;
   gazeDot.style.display = webgazer.params.showGazeDot ? "block" : "none";
   gazeDot.style.position = "fixed";
-  gazeDot.style.zIndex = 99999;
+  gazeDot.style.zIndex = "99999";
   gazeDot.style.left = "-5px";
   gazeDot.style.top = "-5px";
   gazeDot.style.background = "red";
@@ -630,6 +634,7 @@ async function init(stream) {
  */
 function setUserMediaVariable() {
   if (navigator.mediaDevices === undefined) {
+    // @ts-ignore
     navigator.mediaDevices = {};
   }
 
@@ -637,6 +642,7 @@ function setUserMediaVariable() {
     navigator.mediaDevices.getUserMedia = function (constraints) {
       // gets the alternative old getUserMedia is possible
       var getUserMedia =
+        // @ts-ignore
         navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
       // set an error message if browser doesn't support getUserMedia
@@ -668,6 +674,7 @@ webgazer.begin = function (onFail) {
   if (
     window.location.protocol !== "https:" &&
     window.location.hostname !== "localhost" &&
+    // @ts-ignore
     window.chrome
   ) {
     alert(
@@ -792,8 +799,11 @@ webgazer.stopVideo = function () {
 webgazer.detectCompatibility = function () {
   var getUserMedia =
     navigator.mediaDevices.getUserMedia ||
+    // @ts-ignore
     navigator.getUserMedia ||
+    // @ts-ignore
     navigator.webkitGetUserMedia ||
+    // @ts-ignore
     navigator.mozGetUserMedia;
 
   return getUserMedia !== undefined;
@@ -803,7 +813,7 @@ webgazer.detectCompatibility = function () {
  * Set whether to show any of the video previews (camera, face overlay, feedback box).
  * If true: visibility depends on corresponding params (default all true).
  * If false: camera, face overlay, feedback box are all hidden
- * @param {bool} val
+ * @param {boolean} val
  * @return {webgazer} this
  */
 webgazer.showVideoPreview = function (val) {
@@ -818,8 +828,7 @@ webgazer.showVideoPreview = function (val) {
  * hides a video element (videoElement or videoContainerElement)
  * uses display = 'none' for all browsers except Safari and Firefox, which
  * use opacity = '1' because they optimize out video element if display = 'none'
- * @param {Object} element
- * @return {null}
+ * @param {Object} val
  */
 function hideVideoElement(val) {
   if (
@@ -835,7 +844,7 @@ function hideVideoElement(val) {
 
 /**
  * Set whether the camera video preview is visible or not (default true).
- * @param {*} bool
+ * @param {boolean} val
  * @return {webgazer} this
  */
 webgazer.showVideo = function (val) {
@@ -851,7 +860,7 @@ webgazer.showVideo = function (val) {
 
 /**
  * Set whether the face overlay is visible or not (default true).
- * @param {*} bool
+ * @param {boolean} val
  * @return {webgazer} this
  */
 webgazer.showFaceOverlay = function (val) {
@@ -864,7 +873,7 @@ webgazer.showFaceOverlay = function (val) {
 
 /**
  * Set whether the face feedback box is visible or not (default true).
- * @param {*} bool
+ * @param {boolean} val
  * @return {webgazer} this
  */
 webgazer.showFaceFeedbackBox = function (val) {
@@ -972,7 +981,7 @@ function setInternalVideoBufferSizes(width, height) {
 
 /**
  *  Set a static video file to be used instead of webcam video
- *  @param {String} videoLoc - video file location
+ *  @param {MediaProvider} videoLoc - video file location
  *  @return {webgazer} this
  */
 webgazer.setStaticVideo = function (videoLoc) {
@@ -1029,8 +1038,8 @@ webgazer.removeMouseEventListeners = function () {
 
 /**
  *  Records current screen position for current pupil features.
- *  @param {String} x - position on screen in the x axis
- *  @param {String} y - position on screen in the y axis
+ *  @param {number} x - position on screen in the x axis
+ *  @param {number} y - position on screen in the y axis
  *  @param {String} eventType - "click" or "move", as per eventTypes
  *  @return {webgazer} this
  */
@@ -1090,7 +1099,7 @@ webgazer.setRegression = function (name) {
 /**
  * Adds a new tracker module so that it can be used by setTracker()
  * @param {String} name - the new name of the tracker
- * @param {Function} constructor - the constructor of the curTracker object
+ * @param {Object} constructor - the constructor of the curTracker object
  * @return {webgazer} this
  */
 webgazer.addTrackerModule = function (name, constructor) {
@@ -1102,7 +1111,7 @@ webgazer.addTrackerModule = function (name, constructor) {
 /**
  * Adds a new regression module so that it can be used by setRegression() and addRegression()
  * @param {String} name - the new name of the regression
- * @param {Function} constructor - the constructor of the regression object
+ * @param {Object} constructor - the constructor of the regression object
  */
 webgazer.addRegressionModule = function (name, constructor) {
   regressionMap[name] = function () {
@@ -1125,7 +1134,7 @@ webgazer.addRegression = function (name) {
 
 /**
  * Sets a callback to be executed on every gaze event (currently all time steps)
- * @param {function} listener - The callback function to call (it must be like function(data, elapsedTime))
+ * @param {(data: any, elapsedTime: any) => void} listener - The callback function to call (it must be like function(data, elapsedTime))
  * @return {webgazer} this
  */
 webgazer.setGazeListener = function (listener) {
@@ -1161,7 +1170,7 @@ webgazer.clearData = async function () {
 //GETTERS
 /**
  * Returns the tracker currently in use
- * @return {tracker} an object following the tracker interface
+ * @return {object} an object following the tracker interface
  */
 webgazer.getTracker = function () {
   return curTracker;
