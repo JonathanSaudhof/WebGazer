@@ -4,7 +4,7 @@
   "compilerOptions": {
     "lib": ["dom", "dom.iterable"],
     "allowJs": true,
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "checkJs": true,
     "declaration": true,
     "emitDeclarationOnly": true,

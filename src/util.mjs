@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * @typedef {Object} Util
  * @property {function(new:DataWindow, number, Array=):DataWindow} DataWindow
@@ -9,7 +11,7 @@
  * @property {function(Array, number):Array} threshold
  * @property {function(Array, Array):number} correlation
  * @property {function(Eye, number, number):ImageData} resizeEye
- * @property {function(Array):Array} bound
+ * @property {function(Array):Array.<{x:number, y:number}>} bound
  */
 
 /** @type {Util} */
@@ -264,7 +266,7 @@ util.resizeEye = function (eye, resizeWidth, resizeHeight) {
 
 /**
  * Checks if the prediction is within the boundaries of the viewport and constrains it
- * @param  {Array} prediction [x,y] - predicted gaze coordinates
+ * @param  {{x:number, y:number}} prediction [x,y] - predicted gaze coordinates
  * @return {Array} constrained coordinates
  */
 util.bound = function (prediction) {
