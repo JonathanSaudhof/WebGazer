@@ -1,4 +1,5 @@
 // @ts-nocheck
+import webgazer from "./index.mjs";
 
 /**
  * @typedef {Object} Util
