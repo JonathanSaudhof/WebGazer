@@ -8,6 +8,7 @@
   "license": "GPL-3.0-or-later",
   "module": "src/index.mjs",
   "type": "module",
+  "types": "dist/index.d.mts",
   "scripts": {
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
